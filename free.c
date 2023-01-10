@@ -13,11 +13,11 @@ static void output(char mode, int64_t size)
     switch (mode)
     {
     case 'm':
-        printf("%18lld", size / (1024 * 1024));
+        printf("%lld", size / (1024 * 1024));
         break;
     default:
         fmt_scaled(size, human_size);
-        printf("%18s", human_size);
+        printf("%s", human_size);
         break;
     }
 }
@@ -35,7 +35,6 @@ int main(int argc, char **argv)
     size_t len;
     char mode = 'h';
     int64_t phy_mem, used_mem, free_mem;
-    int64_t swap, used_swap, free_swap;
 
     if (pledge("stdio ps vminfo", NULL) == -1)
     {
@@ -88,24 +87,9 @@ int main(int argc, char **argv)
     free_mem = (int64_t)uvm.pagesize * uvm.free;
     used_mem = phy_mem - free_mem;
 
-    swap = (int64_t)uvm.pagesize * uvm.swpages;
-    used_swap = (int64_t)uvm.pagesize * uvm.swpginuse;
-    free_swap = swap - used_swap;
-
-    printf("        %18s%18s%18s\n", "total", "used", "free");
-
-    printf("Mem:    ");
-    output(mode, phy_mem);
     output(mode, used_mem);
-    output(mode, free_mem);
-    printf("\n");
     
-    printf("Swap:   ");
-    output(mode, swap);
-    output(mode, used_swap);
-    output(mode, free_swap);
     printf("\n");
 
     return 0;
 }
-
